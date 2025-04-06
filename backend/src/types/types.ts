@@ -40,14 +40,18 @@ export interface IUser extends Document, TUser{
     updatedAt?: Date;
 }
 
-export interface INote extends Document, TNote{
+export interface INote extends Document, Omit<TNote, 'userid' | 'tags'>{
+    userid: Types.ObjectId;
+    tags: Types.ObjectId[];
     _id: Types.ObjectId;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
 
-export interface IStream extends Document, TStream{
+export interface IStream extends Document, Omit<TStream, 'userid' | 'tags'>{
+    userid: Types.ObjectId;
+    tags: Types.ObjectId[];
     _id: Types.ObjectId;
     createdAt?: Date;
     updatedAt?: Date;
@@ -59,7 +63,9 @@ export interface ITodo extends Document, TTodo{
     updatedAt?: Date;
 }
 
-export interface ITodos extends Document, TTodos{
+export interface ITodos extends Document, Omit<TTodos, 'userid' | 'tags'>{
+    userid: Types.ObjectId;
+    tags: Types.ObjectId[];
     _id: Types.ObjectId;
     createdAt?: Date;
     updatedAt?: Date;
