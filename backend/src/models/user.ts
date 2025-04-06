@@ -3,7 +3,21 @@ import { IUser } from '../types/types';
 
 
 const UserSchema = new Schema<IUser>({
-    username: {type: String ,required: true, trim: true, unique: true, minLength: 3, maxLength: 30, lowercase: true},
-    password: {type: String, required: true, minLength: 6},})
+    username: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+      minlength: 3,
+      maxlength: 50,
+      lowercase: true
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      maxlength: 50
+    }
+  }, { timestamps: true });
 
 export const User = model<IUser>('User', UserSchema)

@@ -3,7 +3,7 @@ import { ITag } from '../types/types';
 
 
 const TagSchema = new Schema<ITag>({
-    tag: { type:String, }
+    tag: { type:String, required: true}
 },
 {timestamps: true});
 

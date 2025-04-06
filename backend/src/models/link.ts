@@ -2,11 +2,12 @@ import mongoose, { model, Schema } from 'mongoose';
 import { ILink } from '../types/types';
 
 
-const TagSchema = new Schema<ILink>({
-    hash: { type:String },
-    userid: { type: Schema.Types.ObjectId, ref: 'User', required: true }
+const LinkSchema = new Schema<ILink>({
+    hash: { type:String, required: true },
+    userid: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    content: { type: Schema.Types.ObjectId, ref: 'Content', required: true }
 },
 {timestamps: true});
 
 
-export const Tag = model<ILink>('Tag', TagSchema);
+export const Link = model<ILink>('Tag', LinkSchema);

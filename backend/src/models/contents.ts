@@ -1,46 +1,65 @@
-import mongoose, { model, Schema } from 'mongoose';
-import { Priority, IContent, INote, IStream, ITodo,ITodos } from '../types/types';
+import { model, Schema } from 'mongoose';
+import { Priority, IContent, INote, IStream, ITodo, ITodos, INetwork, ContentModel, NoteModel, StreamModel, TodosModel, NetworkModel } from '../types/types';
 import { User } from './user';
-import { Tag } from './tags';
+import { Tag } from './tags'
+
+
+const baseOptions = {
+  discriminatorKey: 'kind',
+  collection: 'contents',
+  timestamp: true
+}
 
 
 const ContentSchema = new Schema<IContent>({
     title: { type: String, required: true },
     tags: [{ type: Schema.Types.ObjectId, ref: "Tag", required: true }],
     userid: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    private: { type: Boolean, default: true, required: true},
+    private: { type: Boolean, default: true },
     priority: { type: String, enum: Object.values(Priority), default: Priority.Medium },
 },
-{timestamps: true});
+baseOptions);
 
-export const Content = model<IContent>('Content', ContentSchema)
+
+
+export const Content : ContentModel = model<IContent>('Content', ContentSchema)
 
 const NoteSchema = new Schema<INote>({
     note: { type: String, required: true }
 });
 
-export const Note = Content.discriminator<INote>('Note', NoteSchema)
+
+export const Note : NoteModel = Content.discriminator<INote>('note', NoteSchema)
 
 
 const StreamSchema = new Schema<IStream>({
     link: { type: String, required: true }
 });
 
-export const Stream = Content.discriminator<IStream>('Stream', StreamSchema)
+
+export const Stream : StreamModel = Content.discriminator<IStream>('stream', StreamSchema)
 
 
 const TodoItemSchema = new Schema<ITodo>({
     title: { type: String, required: true },
-    desc: { type: String, required: true },
+    desc: { type: String, required: false },
     done: { type: Boolean, default: false }
   });
   
-  const TodoSchema = new Schema<ITodos>({
+  const TodosSchema = new Schema<ITodos>({
     todos: { type: [TodoItemSchema], required: true }
   });
 
-export const Todo = Content.discriminator<ITodo>('Todo', TodoSchema)
+
+export const Todos : TodosModel = Content.discriminator<ITodos>('todos', TodosSchema)
 
 
+const networkSchema = new Schema<INetwork>({
+  nodes: [{ type: Schema.Types.ObjectId, ref: "Content"}]
+})
 
-//export Content, Note, Stream, Todo
+
+export const Network : NetworkModel = Content.discriminator<INetwork>('network', networkSchema)
+
+
+//export models => Content, Note, Stream, Todos, Network
