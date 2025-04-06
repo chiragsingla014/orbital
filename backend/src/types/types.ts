@@ -73,3 +73,9 @@ export type NoteModel = Model<INote>;
 export type StreamModel = Model<IStream>;
 export type TodosModel = Model<ITodos>;
 export type NetworkModel = Model<INetwork>;
+
+
+
+export interface JWTPayload{
+    userid: string;
+}
