@@ -21,7 +21,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             res.status(411).json({"error": "username doesn't exist"});
             return;
         }
-        (req as Request & { userid: string}).userid = body.userid;
+        req.body.userid = body.userid;
         next();
     }catch(err){
         console.error(err);

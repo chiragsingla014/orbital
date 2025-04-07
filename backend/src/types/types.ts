@@ -75,6 +75,7 @@ export type TodosModel = Model<ITodos>;
 export type NetworkModel = Model<INetwork>;
 
 
+export type AllModels = NoteModel | StreamModel | TodosModel | NetworkModel | ContentModel ;
 
 export interface JWTPayload{
     userid: string;
