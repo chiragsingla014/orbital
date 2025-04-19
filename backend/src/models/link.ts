@@ -1,5 +1,5 @@
 import mongoose, { model, Schema } from 'mongoose';
-import { ILink } from '../types/types';
+import { ILink } from '../types/link';
 
 
 const LinkSchema = new Schema<ILink>({

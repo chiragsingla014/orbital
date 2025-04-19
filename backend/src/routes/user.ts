@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
-import { TUser, } from "../types/types";
-import { userSchema } from "../valid/valid";
+import { TUser, } from "../types/user";
+import { userSchema } from "../valid/user";
 import { User } from "../models/user";
 import { hash, compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';

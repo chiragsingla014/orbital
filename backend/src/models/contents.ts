@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { Priority, IContent, INote, IStream, ITodo, ITodos, INetwork, ContentModel, NoteModel, StreamModel, TodosModel, NetworkModel } from '../types/types';
+import { Priority, IContent, INote, IStream, ITodo, ITodos, INetwork, ContentModel, NoteModel, StreamModel, TodosModel, NetworkModel } from '../types/contents';
 import { User } from './user';
 import { Tag } from './tags'
 
@@ -47,7 +47,7 @@ const TodoItemSchema = new Schema<ITodo>({
   });
   
   const TodosSchema = new Schema<ITodos>({
-    todos: { type: [TodoItemSchema], required: true }
+    todos: { type: [TodoItemSchema]}
   });
 
 

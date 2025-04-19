@@ -1,5 +1,5 @@
 import mongoose, { model, Schema } from 'mongoose';
-import { ITag } from '../types/types';
+import { ITag } from '../types/tags';
 
 
 const TagSchema = new Schema<ITag>({

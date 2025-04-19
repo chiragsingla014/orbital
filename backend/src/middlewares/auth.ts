@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { TUser, } from "../types/types";
-import { userSchema } from "../valid/valid";
+import { TUser, } from "../types/user";
+import { userSchema } from "../valid/user";
 import { User } from "../models/user";
 import { verify } from 'jsonwebtoken';
 import { getEnv } from "../utils/utils";
@@ -11,7 +11,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     try{
         const auth = req.headers.authorization;
         if(!auth || !auth.startsWith("Bearer")){
-            res.status(403).json({"error":"invalid token"});
+            res.status(403).json({"error":"invalid token 1"});
             return;
         }
         const token = auth.split(" ")[1];
@@ -21,7 +21,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             res.status(411).json({"error": "username doesn't exist"});
             return;
         }
-        req.body.userid = body.userid;
+        req.body = { ...req.body, userid: body.userid} as typeof req.body & {userid : string};
         next();
     }catch(err){
         console.error(err);

@@ -1,8 +1,10 @@
 import { Router, Request, Response } from "express";
 import { authMiddleware } from "../middlewares/auth";
 import { Content, Note, Todos, Stream, Network } from "../models/contents";
-import { ContentUnionSchema } from "../valid/valid";
-import { IContent, AllModels, ContentModel } from "../types/types";
+import { ContentUnionSchema, UpdateUnionSchema } from "../valid/contents";
+import { IContent, AllModels, ContentModel, StreamModel, TAllContents } from "../types/contents";
+import { Tag } from "../models/tags";
+import { Types } from "mongoose";
 const contentRouter = Router();
 
 
@@ -37,25 +39,26 @@ contentRouter.get('/',authMiddleware, async (req : Request, res : Response) => {
         switch(kind){
             case 'content':
                 Model = Content;
-                items = await Model.find().sort(sortOrder).skip(skip).limit(limitn);
+                items = await Model.find({userid : req.body.userid}).sort(sortOrder).skip(skip).limit(limitn).populate('tags');
                 break;
             case 'note':
                 Model = Note;
-                items = await Model.find().sort(sortOrder).skip(skip).limit(limitn);
+                items = await Model.find({userid : req.body.userid}).sort(sortOrder).skip(skip).limit(limitn).populate('tags');
                 break;
             case 'todos':
                 Model = Todos;
-                items = await Model.find().sort(sortOrder).skip(skip).limit(limitn);
+                items = await Model.find({userid : req.body.userid}).sort(sortOrder).skip(skip).limit(limitn).populate('tags');
                 break;
             case 'stream':
                 Model = Stream;
-                items = await Model.find().sort(sortOrder).skip(skip).limit(limitn);
+                items = await Model.find({userid : req.body.userid}).sort(sortOrder).skip(skip).limit(limitn).populate('tags');
                 break;
             case 'network':
                 Model = Network;
-                items = await Model.find().sort(sortOrder).skip(skip).limit(limitn);
+                items = await Model.find({userid : req.body.userid}).sort(sortOrder).skip(skip).limit(limitn).populate('tags');
                 break;
         }
+
         res.status(200).json(items);
         return;
 
@@ -70,24 +73,38 @@ contentRouter.get('/',authMiddleware, async (req : Request, res : Response) => {
 // post / ?type=....
 contentRouter.post('/',authMiddleware, async (req : Request, res : Response) => {
     try{
-        const { success, data } = ContentUnionSchema.safeParse(req.body);
-        if(!success){
+        const parsed = ContentUnionSchema.safeParse(req.body);
+        if(!parsed.success){
             res.status(400).json({ error: "invalid data"});
-                return;
+            // @ts-ignore
+            console.log(parsed.error.errors);
+            return;
         }
+        const tags: string[] = [];
+
+        for (const item of parsed.data.tags ?? []) {
+        let tag = await Tag.findOne({ tag: item });
+        if (!tag) {
+            tag = await Tag.create({ tag: item });
+        }
+        tags.push(tag._id as unknown as string);
+        }
+
+        (parsed.data as TAllContents).tags = tags;
+            
         let content;
-        switch(data.kind){
+        switch(parsed.data.kind){
             case 'network':
-                content = await Network.create(data);
+                content = await Network.create(parsed.data);
                 break;
             case 'note':
-                content = await Network.create(data);
+                content = await Note.create(parsed.data);
                 break;
             case 'todos':
-                content = await Network.create(data);
+                content = await Todos.create(parsed.data);
                 break;
             case 'stream':
-                content = await Network.create(data);
+                content = await Stream.create(parsed.data);
                 break;
         }
         res.status(200).json(content);
@@ -101,10 +118,16 @@ contentRouter.post('/',authMiddleware, async (req : Request, res : Response) => 
 });
 
 //get /:id
-contentRouter.post('/:id',authMiddleware, async (req : Request, res : Response) => {
+contentRouter.get('/:id',authMiddleware, async (req : Request, res : Response) => {
     try{
         const contentid :string = req.params.id;
-        
+        const content = await Content.findOne({_id: contentid, userid: req.body.userid}).populate('tags');
+        if(!content){
+            res.status(404).json({error: "not found"});
+            return;
+        }
+        res.status(200).json(content);
+        return;
     }catch(err: any){
         console.log(err);
         res.status(500).json({error: err.message});
@@ -112,23 +135,56 @@ contentRouter.post('/:id',authMiddleware, async (req : Request, res : Response) 
     }
 });
 
-// put (all data) /:id 
-contentRouter.post('/:id',authMiddleware, async (req : Request, res : Response) => {
-    try{
-        const contentid : string = req.params.id;
-
-    }catch(err: any){
-        console.log(err);
-        res.status(500).json({error: err.message});
-        return;
-    }
-});
 
 
 //patch (some data) /:id
-contentRouter.post('/:id',authMiddleware, async (req : Request, res : Response) => {
+contentRouter.patch('/:id',authMiddleware, async (req : Request, res : Response) => {
     try{
         const contentid : string = req.params.id;
+        const { success, data} = UpdateUnionSchema.safeParse(req.body);
+        if(!success){
+            res.status(411).json({error: "invalid data"});
+            return;
+        }
+        let content = await Content.findById(contentid);
+        if(!content){
+            res.status(404).json({error: "invalid id"});
+            return;
+        }
+        if(content.userid != req.body.userid){
+            res.status(411).json({error:"invalid id"});
+            return;
+        }
+        const tags: string[] = [];
+
+        for (const item of data.tags ?? []) {
+        let tag = await Tag.findOne({ tag: item });
+        if (!tag) {
+            tag = await Tag.create({ tag: item });
+        }
+        tags.push(tag._id as unknown as string);
+        }
+
+        (data as TAllContents).tags = tags;
+            
+
+        switch(data.kind){
+            case 'network':
+                content = await Network.findByIdAndUpdate(contentid, data, { new: true });
+                break;
+            case 'note':
+                content = await Note.findByIdAndUpdate(contentid, data, { new: true });
+                break;
+            case 'todos':
+                content = await Todos.findByIdAndUpdate(contentid, data, { new: true });
+                break;
+            case 'stream':
+                content = await Stream.findByIdAndUpdate(contentid, data, { new: true });
+                break;
+        }
+        res.status(201).json(content);
+        return;
+        
 
     }catch(err: any){
         console.log(err);
@@ -138,9 +194,22 @@ contentRouter.post('/:id',authMiddleware, async (req : Request, res : Response) 
 });
 
 // delete /:id
-contentRouter.post('/:id',authMiddleware, async (req : Request, res : Response) => {
+contentRouter.delete('/:id',authMiddleware, async (req : Request, res : Response) => {
     try{
         const contentid : string = req.params.id;
+        let content = await Content.findById(contentid);
+        if(!content){
+            res.status(404).json({error: "invalid id"});
+            return;
+        }
+        if(content.userid != req.body.userid){
+            res.status(411).json({error:"invalid id"});
+            return;
+        }
+        const final = await Content.findByIdAndDelete(contentid);
+        res.status(201).json({message: "deleted successfully"});
+        return;
+        
 
     }catch(err: any){
         console.log(err);
