@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { authMiddleware } from "../middlewares/auth";
 import { Content, Note, Todos, Stream, Network } from "../models/contents";
 import { ContentUnionSchema, UpdateUnionSchema } from "../valid/contents";
-import { IContent, AllModels, ContentModel, StreamModel, TAllContents } from "../types/contents";
+import { IContent, AllModels, ContentModel, StreamModel, TAllContents, TNetwork } from "../types/contents";
 import { Tag } from "../models/tags";
 import { Types } from "mongoose";
 const contentRouter = Router();
@@ -40,6 +40,13 @@ contentRouter.get('/',authMiddleware, async (req : Request, res : Response) => {
             case 'content':
                 Model = Content;
                 items = await Model.find({userid : req.body.userid}).sort(sortOrder).skip(skip).limit(limitn).populate('tags');
+                await Promise.all(
+                    items.map(async (item) => {
+                      if (item.kind === 'network') {
+                        await item.populate('nodes');
+                      }
+                    })
+                  );
                 break;
             case 'note':
                 Model = Note;
@@ -55,7 +62,7 @@ contentRouter.get('/',authMiddleware, async (req : Request, res : Response) => {
                 break;
             case 'network':
                 Model = Network;
-                items = await Model.find({userid : req.body.userid}).sort(sortOrder).skip(skip).limit(limitn).populate('tags');
+                items = await Model.find({userid : req.body.userid}).sort(sortOrder).skip(skip).limit(limitn).populate('tags').populate('nodes');
                 break;
         }
 
@@ -95,6 +102,22 @@ contentRouter.post('/',authMiddleware, async (req : Request, res : Response) => 
         let content;
         switch(parsed.data.kind){
             case 'network':
+                const nodes: string[] = [];
+                for(const itemid of parsed.data.nodes){
+                    const item = await Content.findOne({_id: itemid});
+                    if(!item){
+                        res.status(404).json({"error": "one or more nodes not found"});
+                        return;
+                    }
+                    if(item.userid as unknown as string != parsed.data.userid  && item.private == true){
+                        res.status(404).json({"error": "one or more nodes not found"});
+                        return;
+                    }
+                    nodes.push(item._id as unknown as string);
+
+                }
+                (parsed.data as TNetwork).nodes = nodes;
+
                 content = await Network.create(parsed.data);
                 break;
             case 'note':
