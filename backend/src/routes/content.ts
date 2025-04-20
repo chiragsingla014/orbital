@@ -119,17 +119,22 @@ contentRouter.post('/',authMiddleware, async (req : Request, res : Response) => 
                 (parsed.data as TNetwork).nodes = nodes;
 
                 content = await Network.create(parsed.data);
+                (await content.populate('nodes')).populate('tags');
                 break;
             case 'note':
                 content = await Note.create(parsed.data);
+                await content.populate('tags');
                 break;
             case 'todos':
                 content = await Todos.create(parsed.data);
+                await content.populate('tags');
                 break;
             case 'stream':
                 content = await Stream.create(parsed.data);
+                await content.populate('tags');
                 break;
         }
+        
         res.status(200).json(content);
 
 
@@ -149,6 +154,9 @@ contentRouter.get('/:id',authMiddleware, async (req : Request, res : Response) =
             res.status(404).json({error: "not found"});
             return;
         }
+        if (content?.kind === 'network') {
+            await content.populate('nodes');
+          }
         res.status(200).json(content);
         return;
     }catch(err: any){
@@ -178,22 +186,26 @@ contentRouter.patch('/:id',authMiddleware, async (req : Request, res : Response)
             res.status(411).json({error:"invalid id"});
             return;
         }
-        const tags: string[] = [];
+        if(data.tags){
+            const tags: string[] = [];
 
-        for (const item of data.tags ?? []) {
-        let tag = await Tag.findOne({ tag: item });
-        if (!tag) {
-            tag = await Tag.create({ tag: item });
-        }
-        tags.push(tag._id as unknown as string);
+            for (const item of data.tags ?? []) {
+            let tag = await Tag.findOne({ tag: item });
+            if (!tag) {
+                tag = await Tag.create({ tag: item });
+            }
+            tags.push(tag._id as unknown as string);
+            }
+    
+            (data as TAllContents).tags = tags;
         }
 
-        (data as TAllContents).tags = tags;
             
 
         switch(data.kind){
             case 'network':
                 content = await Network.findByIdAndUpdate(contentid, data, { new: true });
+                await content?.populate('nodes');
                 break;
             case 'note':
                 content = await Note.findByIdAndUpdate(contentid, data, { new: true });
@@ -205,6 +217,7 @@ contentRouter.patch('/:id',authMiddleware, async (req : Request, res : Response)
                 content = await Stream.findByIdAndUpdate(contentid, data, { new: true });
                 break;
         }
+        await content?.populate('tags');
         res.status(201).json(content);
         return;
         
