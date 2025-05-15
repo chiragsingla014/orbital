@@ -41,18 +41,18 @@ userRouter.post('/signin', async (req : Request, res : Response) => {
     try{
         const result = userSchema.safeParse(req.body);
         if(!result.success){
-            res.status(411).json({"error":"incorrect data"});
+            res.status(400).json({"error":"incorrect data"});
             return;
         }
         const body = result.data;
         const user = await User.findOne({ username: body.username });
         if(!user){
-            res.status(411).json({"error": "username or password incorrect"});
+            res.status(401).json({"error": "username or password incorrect"});
             return;
         }
         const isMatch = await compare(body.password, user.password);
         if(!isMatch){
-            res.status(411).json({"error": "username or password incorrect"});
+            res.status(401).json({"error": "username or password incorrect"});
             return;
         }
         const userid = user._id;

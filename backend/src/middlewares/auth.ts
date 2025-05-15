@@ -11,7 +11,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     try{
         const auth = req.headers.authorization;
         if(!auth || !auth.startsWith("Bearer")){
-            res.status(403).json({"error":"invalid token 1"});
+            res.status(403).json({"error":"invalid token"});
             return;
         }
         const token = auth.split(" ")[1];

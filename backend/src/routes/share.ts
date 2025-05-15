@@ -17,7 +17,7 @@ shareRouter.get('/:id', async (req : Request, res : Response) => {
         res.status(404).json({ error: "Not found" });
         return;
     }
-    res.status(201).json(content);
+    res.status(200).json(content);
     return;
 })
 

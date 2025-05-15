@@ -218,7 +218,7 @@ contentRouter.patch('/:id',authMiddleware, async (req : Request, res : Response)
                 break;
         }
         await content?.populate('tags');
-        res.status(201).json(content);
+        res.status(200).json(content);
         return;
         
 
@@ -243,7 +243,7 @@ contentRouter.delete('/:id',authMiddleware, async (req : Request, res : Response
             return;
         }
         const final = await Content.findByIdAndDelete(contentid);
-        res.status(201).json({message: "deleted successfully"});
+        res.status(200).json({message: "deleted successfully"});
         return;
         
 
