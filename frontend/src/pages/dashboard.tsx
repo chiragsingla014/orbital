@@ -26,7 +26,7 @@ export function Dashboard() {
       <div className="flex justify-end gap-4">
         <Button onClick={() => {
           setModalOpen(true)
-        }} variant="primary" text="Add content" startIcon={<PlusIcon />}></Button>
+        }} variant="primary" text="Add Content" startIcon={<PlusIcon />}></Button>
         <Button onClick={async () => {
             const response = await axios.post(`${BACKEND_URL}/api/v1/brain/share`, {
                 share: true
@@ -37,14 +37,12 @@ export function Dashboard() {
             });
             const shareUrl = `http://localhost:5173/share/${response.data.hash}`;
             alert(shareUrl);
-        }} variant="secondary" text="Share brain" startIcon={<ShareIcon />}></Button>
+        }} variant="secondary" text="Share Content" startIcon={<ShareIcon />}></Button>
       </div>
 
       <div className="flex gap-4 flex-wrap">
-        {contents.map(({type, link, title}) => <Card 
-            type={type}
-            link={link}
-            title={title}
+        {contents.map((content) => <Card 
+            content={content}
         />)}
       </div>
     </div>

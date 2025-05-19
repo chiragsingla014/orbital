@@ -7,14 +7,22 @@ import axios from "axios";
 
 enum ContentType {
     Youtube = "youtube",
-    Twitter = "twitter"
+    Note = "note",
+    Todos = "todos",
+    Network = "network"
 }
+
+// enum Priority {
+//     High = "high",
+//     Medium = "medium",
+//     Low = "low"
+// }
 
 // controlled component
 export function CreateContentModal({open, onClose} : {open: boolean, onClose: ()=> void}) {
     const titleRef = useRef<HTMLInputElement | null>(null);
     const linkRef = useRef<HTMLInputElement | null>(null);
-    const [type, setType] = useState(ContentType.Youtube);
+    const [type, setType] = useState(ContentType.Note);
 
     async function addContent() {
         const title = titleRef.current?.value;
@@ -54,12 +62,19 @@ export function CreateContentModal({open, onClose} : {open: boolean, onClose: ()
                         <div>
                             <h1>Type</h1>
                             <div className="flex gap-1 justify-center pb-2">
+                                <Button text="Note" variant={type === ContentType.Note ? "primary" : "secondary"} onClick={() => {
+                                    setType(ContentType.Note)
+                                }}></Button>
+                                <Button text="Todos" variant={type === ContentType.Todos ? "primary" : "secondary"} onClick={() => {
+                                    setType(ContentType.Todos)
+                                }}></Button>
                                 <Button text="Youtube" variant={type === ContentType.Youtube ? "primary" : "secondary"} onClick={() => {
                                     setType(ContentType.Youtube)
                                 }}></Button>
-                                <Button text="Twitter" variant={type === ContentType.Twitter ? "primary" : "secondary"} onClick={() => {
-                                    setType(ContentType.Twitter)
+                                <Button text="Network" variant={type === ContentType.Network ? "primary" : "secondary"} onClick={() => {
+                                    setType(ContentType.Network)
                                 }}></Button>
+                                
                             </div>
                         </div>
                         <div className="flex justify-center">
