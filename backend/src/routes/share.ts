@@ -7,9 +7,6 @@ const shareRouter = Router();
 
 shareRouter.get('/:id', async (req : Request, res : Response) => {
     const content = await Content.findById(req.params.id).populate('tags');
-    console.log("/n/n/n/n")
-    console.log("/n/n/n/n")
-    console.log(content)
     if (content?.kind === 'network') {
         await content.populate({
           path: 'nodes',
