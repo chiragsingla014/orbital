@@ -10,6 +10,7 @@ const JWT_SECRET : string = getEnv("JWT_SECRET");
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) : Promise<void>=>{
     try{
         const auth = req.headers.authorization;
+        console.log(auth)
         if(!auth || !auth.startsWith("Bearer")){
             res.status(403).json({"error":"invalid token"});
             return;
@@ -22,6 +23,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             return;
         }
         req.body = { ...req.body, userid: body.userid} as typeof req.body & {userid : string};
+        console.log(req.body)
         next();
     }catch(err){
         console.error(err);

@@ -1,8 +1,8 @@
 import { Button } from "../components/Button";
-import { Card } from "../components/Card";
-import { CreateContentModal } from "../components/CreateContentModal";
+import { Card } from "../components/content/Card";
+import { CreateContentModal } from "../components/content/CreateContentModal";
 import { Input } from "../components/Input";
-import { Sidebar } from "../components/SIdebar";
+import { Sidebar } from "../components/Sidebar";
 import { SidebarItem } from "../components/SidebarItem";
 
 

@@ -1,12 +1,56 @@
 @import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
 
 @theme {
     --color-gray-50: rgba(255, 255, 255, 0.5);
     --color-gray-100: #eeeeef;
     --color-gray-200: #e6e9ed;
     --color-gray-600: #95989c;
-
     --color-purple-200: #d9ddee;
     --color-purple-500: #9492db;
     --color-purple-600: #7164c0;
-    }
+}
+
+.dark {
+    /* page backgrounds */
+    --color-gray-100: #13131f;
+    --color-gray-200: #1e1e30;
+
+    /* card / modal / sidebar backgrounds (bg-white) */
+    --color-white: #1c1c2e;
+
+    /* text */
+    --color-gray-900: #f0f0f8;
+    --color-gray-800: #e0e0ee;
+    --color-gray-700: #c8c8dc;
+    --color-gray-600: #a0a0b8;
+    --color-gray-500: #7878a0;
+    --color-gray-400: #606080;
+
+    /* borders, dividers, hover backgrounds */
+    --color-gray-300: #2e2e48;
+    --color-gray-50: rgba(255, 255, 255, 0.04);
+
+    /* purple — keep brand colors, just adjust backgrounds */
+    --color-purple-200: #2e2b52;
+    --color-purple-500: #9492db;
+    --color-purple-600: #7164c0;
+
+    /* blue tags (public badge) */
+    --color-blue-100: #1e2a3e;
+    --color-blue-600: #60a5fa;
+
+    /* green (todos done) */
+    --color-green-50: #0d1f0d;
+    --color-green-100: #14290f;
+    --color-green-200: #1a3314;
+    --color-green-500: #4ade80;
+
+    /* red (delete buttons) */
+    --color-red-50: #1f0d0d;
+    --color-red-300: #7f1d1d;
+    --color-red-500: #f87171;
+
+    /* slate (modal backdrop) */
+    --color-slate-500: #0a0a14;
+}

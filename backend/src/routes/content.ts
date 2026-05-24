@@ -39,14 +39,22 @@ contentRouter.get('/',authMiddleware, async (req : Request, res : Response) => {
         switch(kind){
             case 'content':
                 Model = Content;
-                items = await Model.find({userid : req.body.userid}).sort(sortOrder).skip(skip).limit(limitn).populate('tags');
+                items = await Model.find({userid: req.body.userid}).sort(sortOrder).skip(skip).limit(limitn).populate('tags');
                 await Promise.all(
                     items.map(async (item) => {
-                      if (item.kind === 'network') {
-                        await item.populate('nodes');
-                      }
+                        if (item.kind === 'network') {
+                            await item.populate('nodes');
+                            await Promise.all(
+                                (item as any).nodes.map(async (node: any) => {
+                                    await node.populate('tags');
+                                    if (node.kind === 'network') {
+                                        await node.populate('nodes');
+                                    }
+                                })
+                            );
+                        }
                     })
-                  );
+                );
                 break;
             case 'note':
                 Model = Note;
@@ -62,9 +70,21 @@ contentRouter.get('/',authMiddleware, async (req : Request, res : Response) => {
                 break;
             case 'network':
                 Model = Network;
-                items = await Model.find({userid : req.body.userid}).sort(sortOrder).skip(skip).limit(limitn).populate('tags').populate('nodes');
+                items = await Model.find({userid: req.body.userid}).sort(sortOrder).skip(skip).limit(limitn).populate('tags').populate('nodes');
+                await Promise.all(
+                    items.map(async (item) => {
+                        await Promise.all(
+                            (item as any).nodes.map(async (node: any) => {
+                                await node.populate('tags');
+                                if (node.kind === 'network') {
+                                    await node.populate('nodes');
+                                }
+                            })
+                        );
+                    })
+                );
                 break;
-        }
+            }
 
         res.status(200).json(items);
         return;
@@ -156,6 +176,9 @@ contentRouter.get('/:id',authMiddleware, async (req : Request, res : Response) =
         }
         if (content?.kind === 'network') {
             await content.populate('nodes');
+            await Promise.all(
+                (content as any).nodes.map((node: any) => node.populate('tags'))
+            );
           }
         res.status(200).json(content);
         return;
@@ -218,6 +241,12 @@ contentRouter.patch('/:id',authMiddleware, async (req : Request, res : Response)
                 break;
         }
         await content?.populate('tags');
+        if (content?.kind === 'network') {
+            await content.populate('nodes');
+            await Promise.all(
+                (content as any).nodes.map((node: any) => node.populate('tags'))
+            );
+          }
         res.status(200).json(content);
         return;
         
