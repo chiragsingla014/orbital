@@ -9,7 +9,7 @@
             "root": "backend",
             "routePrefix": "/_/backend",
             "entrypoint": "src/index.ts",
-            "runtime": "@vercel/node"
+            "framework": "express"
         }
     }
 }
