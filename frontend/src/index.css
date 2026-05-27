@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @variant dark (&:where(.dark, .dark *));
 
+html {
+  font-size: 116%; /* equivalent to ~125% zoom effect, default is 16px → becomes 14px */
+}
+
 @theme {
     --color-gray-50: rgba(255, 255, 255, 0.5);
     --color-gray-100: #eeeeef;
