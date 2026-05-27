@@ -2,7 +2,6 @@ import { Signin } from "./pages/Signin"
 import { Signup } from "./pages/Signup"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { Dashboard } from "./pages/dashboard"
-import { Test } from "./pages/test"
 import { ContentView } from "./pages/contentView"
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -36,8 +35,6 @@ function App() {
                 <Route path="/share/:id" element={
                     <ContentView isShared={true} />
                 } />
-                <Route path="/test" element={<Test />} />
-                {/* catch-all MUST be last */}
                 <Route path="*" element={
                     <Navigate to={localStorage.getItem("token") ? "/dashboard" : "/signin"} replace />
                 } />
