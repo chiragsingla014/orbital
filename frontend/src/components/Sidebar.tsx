@@ -19,7 +19,7 @@ interface SidebarProps {
 
 export function Sidebar({ onSelect, tags }: SidebarProps) {
     return (
-        <div className="h-screen bg-white border-r w-72 fixed left-0 top-0 pl-6 overflow-y-auto flex flex-col">
+        <div className="h-screen bg-white border-r w-72 pl-6 overflow-y-auto flex flex-col">
             <div
                 className="flex text-2xl text-gray-900 pt-8 items-center cursor-pointer hover:text-purple-600 transition-colors"
                 onClick={() => onSelect({ kind: null, priority: null, tag: null })}
